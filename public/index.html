@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>זמן גן - התרעות היום</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Varela+Round&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sun-yellow: #FFD93D;
+      --sun-orange: #FF8C42;
+      --sky-blue: #87CEEB;
+      --sky-light: #E8F4FD;
+      --grass-green: #7CB342;
+      --grass-dark: #558B2F;
+      --alert-red: #E53935;
+      --alert-red-light: #FFCDD2;
+      --alert-red-glow: #FF5252;
+      --warm-white: #FFF8F0;
+      --warm-cream: #FFF3E0;
+      --text-dark: #3E2723;
+      --text-medium: #5D4037;
+      --text-light: #8D6E63;
+      --card-shadow: 0 8px 32px rgba(62, 39, 35, 0.08);
+      --card-shadow-hover: 0 12px 40px rgba(62, 39, 35, 0.14);
+      --radius: 20px;
+      --safe-green: #43A047;
+      --safe-green-light: #E8F5E9;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Varela Round', 'Rubik', sans-serif;
+      background: var(--warm-white);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sky background with clouds */
+    .sky-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 380px;
+      background: linear-gradient(180deg, #87CEEB 0%, #B4E0F7 50%, #E8F4FD 80%, var(--warm-white) 100%);
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.7;
+      filter: blur(1px);
+    }
+
+    .cloud::before, .cloud::after {
+      content: '';
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .cloud-1 {
+      width: 120px; height: 45px;
+      top: 60px; right: 10%;
+      animation: drift 35s linear infinite;
+    }
+    .cloud-1::before { width: 55px; height: 55px; top: -25px; right: 20px; }
+    .cloud-1::after { width: 40px; height: 40px; top: -15px; right: 60px; }
+
+    .cloud-2 {
+      width: 90px; height: 35px;
+      top: 110px; right: 60%;
+      opacity: 0.5;
+      animation: drift 45s linear infinite reverse;
+    }
+    .cloud-2::before { width: 40px; height: 40px; top: -20px; right: 15px; }
+    .cloud-2::after { width: 30px; height: 30px; top: -12px; right: 45px; }
+
+    .cloud-3 {
+      width: 100px; height: 38px;
+      top: 45px; right: 35%;
+      opacity: 0.6;
+      animation: drift 50s linear infinite;
+      animation-delay: -15s;
+    }
+    .cloud-3::before { width: 48px; height: 48px; top: -22px; right: 18px; }
+    .cloud-3::after { width: 35px; height: 35px; top: -14px; right: 55px; }
+
+    @keyframes drift {
+      from { transform: translateX(0); }
+      to { transform: translateX(-120vw); }
+    }
+
+    /* Sun */
+    .sun {
+      position: absolute;
+      top: 20px;
+      left: 40px;
+      width: 80px;
+      height: 80px;
+      background: var(--sun-yellow);
+      border-radius: 50%;
+      box-shadow: 0 0 60px rgba(255, 217, 61, 0.6), 0 0 120px rgba(255, 140, 66, 0.2);
+      animation: sun-pulse 4s ease-in-out infinite;
+    }
+
+    .sun::after {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 217, 61, 0.3) 0%, transparent 70%);
+    }
+
+    @keyframes sun-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 60px rgba(255, 217, 61, 0.6); }
+      50% { transform: scale(1.05); box-shadow: 0 0 80px rgba(255, 217, 61, 0.8); }
+    }
+
+    /* Grass footer */
+    .grass {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 40px;
+      background: linear-gradient(0deg, var(--grass-green) 0%, var(--grass-dark) 60%, transparent 100%);
+      z-index: 0;
+      opacity: 0.3;
+    }
+
+    /* Main container */
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 32px 20px 80px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 30px 0 10px;
+      animation: fadeDown 0.6s ease-out;
+    }
+
+    .header-icon {
+      font-size: 52px;
+      display: block;
+      margin-bottom: 8px;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+      animation: bounce-in 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .header h1 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 800;
+      font-size: 2rem;
+      color: var(--text-dark);
+      letter-spacing: -0.5px;
+    }
+
+    .header .subtitle {
+      font-size: 1rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    .today-date {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: white;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      color: var(--text-medium);
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce-in {
+      0% { transform: scale(0); opacity: 0; }
+      60% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Search */
+    .search-card {
+      background: white;
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-top: 24px;
+      box-shadow: var(--card-shadow);
+      animation: fadeUp 0.5s ease-out 0.2s both;
+    }
+
+    .search-label {
+      display: block;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-medium);
+      margin-bottom: 10px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .search-input-wrapper {
+      flex: 1;
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 18px;
+      border: 2px solid #E0D5CC;
+      border-radius: 14px;
+      font-family: 'Varela Round', sans-serif;
+      font-size: 1.05rem;
+      color: var(--text-dark);
+      background: var(--warm-cream);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      direction: rtl;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-light);
+      opacity: 0.7;
+    }
+
+    .search-input:focus {
+      border-color: var(--sky-blue);
+      box-shadow: 0 0 0 4px rgba(135, 206, 235, 0.2);
+      background: white;
+    }
+
+    .autocomplete-list {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      background: white;
+      border: 2px solid #E0D5CC;
+      border-top: none;
+      border-radius: 0 0 14px 14px;
+      max-height: 200px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+
+    .autocomplete-list.active {
+      display: block;
+    }
+
+    .autocomplete-item {
+      padding: 10px 18px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      color: var(--text-dark);
+      direction: rtl;
+    }
+
+    .autocomplete-item:hover,
+    .autocomplete-item.selected {
+      background: var(--sky-light);
+    }
+
+    .search-btn {
+      padding: 14px 28px;
+      background: linear-gradient(135deg, var(--sun-orange), #FF6F00);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: 'Rubik', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    .search-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(255, 140, 66, 0.35);
+    }
+
+    .search-btn:active {
+      transform: translateY(0);
+    }
+
+    .search-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loading */
+    .loader {
+      display: none;
+      text-align: center;
+      padding: 40px 0;
+      animation: fadeUp 0.3s ease-out;
+    }
+
+    .loader.active { display: block; }
+
+    .loader-dots {
+      display: inline-flex;
+      gap: 8px;
+    }
+
+    .loader-dots span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--sun-orange);
+      animation: dot-bounce 1.2s ease-in-out infinite;
+    }
+
+    .loader-dots span:nth-child(2) { animation-delay: 0.15s; }
+    .loader-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes dot-bounce {
+      0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+      40% { transform: translateY(-12px); opacity: 1; }
+    }
+
+    .loader-text {
+      margin-top: 12px;
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    /* Error */
+    .error-msg {
+      display: none;
+      background: var(--alert-red-light);
+      color: var(--alert-red);
+      padding: 14px 20px;
+      border-radius: 14px;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      text-align: center;
+      animation: shake 0.4s ease-out;
+    }
+
+    .error-msg.active { display: block; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-6px); }
+      40% { transform: translateX(6px); }
+      60% { transform: translateX(-4px); }
+      80% { transform: translateX(4px); }
+    }
+
+    /* Results */
+    #results {
+      display: none;
+      margin-top: 24px;
+      animation: fadeUp 0.5s ease-out;
+    }
+
+    #results.active { display: block; }
+
+    .stat-icon {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--text-dark);
+    }
+
+    .stat-label {
+      font-size: 0.78rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    @keyframes pop-in {
+      0% { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Big message when no alerts */
+    .no-alerts-msg {
+      background: var(--safe-green-light);
+      border-radius: var(--radius);
+      padding: 30px;
+      text-align: center;
+      box-shadow: var(--card-shadow);
+      animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both;
+    }
+
+    .no-alerts-msg .big-icon {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    .no-alerts-msg h2 {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      color: var(--safe-green);
+      font-size: 1.3rem;
+    }
+
+    .no-alerts-msg p {
+      color: var(--text-medium);
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .header h1 { font-size: 1.6rem; }
+      .search-row { flex-direction: column; }
+      .search-btn { width: 100%; }
+      .takeout-body { flex-direction: column; gap: 8px; }
+      .takeout-arrow { transform: rotate(90deg); }
+      .stat-value { font-size: 1.2rem; }
+    }
+
+    /* Takeout scenario card */
+    .takeout-card {
+      background: linear-gradient(135deg, #FFF3E0, #FFF8E1);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--card-shadow);
+      margin-bottom: 20px;
+      border: 2px dashed var(--sun-orange);
+      animation: fadeUp 0.5s ease-out 0.2s both;
+    }
+
+    .takeout-title {
+      font-family: 'Rubik', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--sun-orange);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .takeout-body {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .takeout-stat {
+      flex: 1;
+      min-width: 120px;
+      text-align: center;
+      padding: 12px;
+      background: white;
+      border-radius: 14px;
+    }
+
+    .takeout-stat .stat-value {
+      font-size: 1.3rem;
+    }
+
+    .takeout-stat .stat-label {
+      font-size: 0.75rem;
+    }
+
+    .takeout-arrow {
+      font-size: 1.5rem;
+      color: var(--text-light);
+    }
+
+    .takeout-note {
+      width: 100%;
+      margin-top: 10px;
+      font-size: 0.82rem;
+      color: var(--text-medium);
+      line-height: 1.5;
+    }
+
+    /* Percentage bar */
+    .pct-bar-container {
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+
+    .pct-bar {
+      height: 8px;
+      background: #EEEEEE;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      direction: ltr;
+    }
+
+    .pct-bar .safe-fill {
+      background: linear-gradient(90deg, #66BB6A, var(--safe-green));
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 4px 0 0 4px;
+    }
+
+    .pct-bar .lost-fill {
+      background: linear-gradient(90deg, var(--alert-red), #C62828);
+      transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 0 4px 4px 0;
+    }
+
+    .pct-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-light);
+      margin-top: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 24px 0 16px;
+      margin-top: 32px;
+      font-size: 0.82rem;
+      color: var(--text-light);
+    }
+
+    .footer a {
+      color: var(--sun-orange);
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="sky-bg">
+    <div class="sun"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+  </div>
+  <div class="grass"></div>
+
+  <div class="container">
+    <header class="header">
+      <span class="header-icon">🏫</span>
+      <h1>זמן גן</h1>
+      <div class="subtitle">כמה זמן הילדים יכלו להיות בגן היום?</div>
+      <div class="today-date" id="todayDate"></div>
+    </header>
+
+    <div class="search-card">
+      <label class="search-label" for="cityInput">🔍 חיפוש לפי עיר או יישוב</label>
+      <div class="search-row">
+        <div class="search-input-wrapper">
+          <input
+            type="text"
+            id="cityInput"
+            class="search-input"
+            placeholder="לדוגמה: שדרות, אשקלון, באר שבע..."
+            autocomplete="off"
+          >
+          <div class="autocomplete-list" id="autocompleteList"></div>
+        </div>
+        <button class="search-btn" id="searchBtn" onclick="searchAlerts()">חיפוש</button>
+      </div>
+      <div class="error-msg" id="errorMsg"></div>
+    </div>
+
+    <div class="loader" id="loader">
+      <div class="loader-dots">
+        <span></span><span></span><span></span>
+      </div>
+      <div class="loader-text">מחפש התרעות...</div>
+    </div>
+
+    <div id="results"></div>
+
+    <footer class="footer">
+      נבנה ע״י אלירן מויאל | נתונים באדיבות <a href="https://redalert.orielhaim.com/" target="_blank" rel="noopener">RedAlert API</a>
+    </footer>
+  </div>
+
+  <script>
+    // Constants
+    const KINDER_START_H = 7, KINDER_START_M = 45;
+    const KINDER_END_H = 16, KINDER_END_M = 0;
+    const TOTAL_KINDER_MIN = (KINDER_END_H * 60 + KINDER_END_M) - (KINDER_START_H * 60 + KINDER_START_M); // 495 min
+
+    // City whitelist
+    const ALLOWED_CITIES = [
+      'תל אביב - יפו',
+      'ירושלים',
+      'חיפה',
+      'באר שבע',
+      'אשדוד',
+      'אשקלון',
+      'נתניה',
+      'ראשון לציון',
+      'פתח תקווה',
+      'חולון',
+      'בני ברק',
+      'רמת גן',
+      'הרצליה',
+      'כפר סבא',
+      'רעננה',
+      'מודיעין-מכבים-רעות',
+      'לוד',
+      'רמלה',
+      'בת ים',
+      'גבעתיים',
+      'קרית גת',
+      'שדרות',
+      'עפולה',
+      'טבריה',
+      'נהריה',
+      'עכו',
+      'קרית שמונה',
+      'דימונה',
+      'ערד',
+      'אילת',
+      'רהט',
+      'נתיבות',
+      'אופקים',
+      'יבנה',
+      'כרמיאל',
+      'נצרת',
+      'עראבה',
+    ];
+    const allowedSet = new Set(ALLOWED_CITIES);
+
+    // Autocomplete
+    const cityInput = document.getElementById('cityInput');
+    const autocompleteList = document.getElementById('autocompleteList');
+    let selectedIdx = -1;
+
+    cityInput.addEventListener('input', () => {
+      const val = cityInput.value.trim();
+      if (!val) { autocompleteList.classList.remove('active'); return; }
+      const matches = ALLOWED_CITIES.filter(c => c.includes(val));
+      if (matches.length === 0 || (matches.length === 1 && matches[0] === val)) {
+        autocompleteList.classList.remove('active');
+        return;
+      }
+      selectedIdx = -1;
+      autocompleteList.innerHTML = '';
+      matches.forEach((c, i) => {
+        const div = document.createElement('div');
+        div.className = 'autocomplete-item';
+        div.dataset.idx = i;
+        div.textContent = c;
+        div.addEventListener('mousedown', () => selectCity(c));
+        autocompleteList.appendChild(div);
+      });
+      autocompleteList.classList.add('active');
+    });
+
+    cityInput.addEventListener('blur', () => {
+      setTimeout(() => autocompleteList.classList.remove('active'), 150);
+    });
+
+    cityInput.addEventListener('keydown', (e) => {
+      const items = autocompleteList.querySelectorAll('.autocomplete-item');
+      if (autocompleteList.classList.contains('active') && items.length > 0) {
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          selectedIdx = Math.min(selectedIdx + 1, items.length - 1);
+          items.forEach((el, i) => el.classList.toggle('selected', i === selectedIdx));
+          items[selectedIdx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          selectedIdx = Math.max(selectedIdx - 1, 0);
+          items.forEach((el, i) => el.classList.toggle('selected', i === selectedIdx));
+          items[selectedIdx].scrollIntoView({ block: 'nearest' });
+        } else if (e.key === 'Enter') {
+          e.preventDefault();
+          if (selectedIdx >= 0) {
+            selectCity(items[selectedIdx].textContent);
+          } else {
+            autocompleteList.classList.remove('active');
+            searchAlerts();
+          }
+          return;
+        }
+      }
+      if (e.key === 'Enter') searchAlerts();
+    });
+
+    function selectCity(name) {
+      cityInput.value = name;
+      autocompleteList.classList.remove('active');
+      searchAlerts();
+    }
+
+    // Show today's date
+    const now = new Date();
+    const dateFormatter = new Intl.DateTimeFormat('he-IL', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+      timeZone: 'Asia/Jerusalem'
+    });
+    document.getElementById('todayDate').textContent = dateFormatter.format(now);
+
+    async function searchAlerts() {
+      const city = document.getElementById('cityInput').value.trim();
+      if (!city) return;
+
+      if (!allowedSet.has(city)) {
+        const errorMsg = document.getElementById('errorMsg');
+        errorMsg.textContent = '❌ העיר לא נמצאת ברשימה. בחרו עיר מהרשימה.';
+        errorMsg.classList.add('active');
+        return;
+      }
+
+      const btn = document.getElementById('searchBtn');
+      const loader = document.getElementById('loader');
+      const errorMsg = document.getElementById('errorMsg');
+      const results = document.getElementById('results');
+
+      btn.disabled = true;
+      loader.classList.add('active');
+      errorMsg.classList.remove('active');
+      results.classList.remove('active');
+      results.innerHTML = '';
+
+      try {
+        const res = await fetch(`/api/alerts?city=${encodeURIComponent(city)}`);
+        if (!res.ok) throw new Error('שגיאה בשליפת נתונים');
+        const data = await res.json();
+
+        renderResults(data.alerts, city);
+      } catch (err) {
+        errorMsg.textContent = `❌ ${err.message || 'שגיאה בחיבור לשרת'}`;
+        errorMsg.classList.add('active');
+      } finally {
+        btn.disabled = false;
+        loader.classList.remove('active');
+      }
+    }
+
+    function findFirstAlertMin(alerts) {
+      // Find earliest alert time (in minutes from midnight) within kindergarten hours
+      const kinderStartMin = KINDER_START_H * 60 + KINDER_START_M;
+      const kinderEndMin = KINDER_END_H * 60 + KINDER_END_M;
+      let earliest = null;
+
+      for (const alert of alerts) {
+        const d = new Date(alert.timestamp);
+        const israelStr = d.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
+        const israelDate = new Date(israelStr);
+        const alertMin = israelDate.getHours() * 60 + israelDate.getMinutes();
+
+        if (alertMin >= kinderStartMin && alertMin < kinderEndMin) {
+          if (earliest === null || alertMin < earliest) earliest = alertMin;
+        }
+      }
+
+      // If all alerts were before kindergarten started, use kindergarten start
+      if (earliest === null) {
+        const anyBefore = alerts.some(a => {
+          const d = new Date(a.timestamp);
+          const israelStr = d.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' });
+          const israelDate = new Date(israelStr);
+          return israelDate.getHours() * 60 + israelDate.getMinutes() < kinderStartMin;
+        });
+        if (anyBefore) earliest = kinderStartMin;
+      }
+
+      return earliest;
+    }
+
+    function formatMinutes(min) {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      if (h === 0) return `${m} דק׳`;
+      if (m === 0) return `${h} שע׳`;
+      return `${h} שע׳ ${m} דק׳`;
+    }
+
+    function formatTime(min) {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderResults(alerts, city) {
+      const results = document.getElementById('results');
+      const safeCity = escapeHtml(city);
+      const firstAlertMin = findFirstAlertMin(alerts);
+
+      const kinderStartMin = KINDER_START_H * 60 + KINDER_START_M;
+      const kinderEndMin = KINDER_END_H * 60 + KINDER_END_M;
+
+      if (alerts.length === 0 || firstAlertMin === null) {
+        results.innerHTML = `
+          <div class="no-alerts-msg">
+            <span class="big-icon">🌈</span>
+            <h2>אין התרעות היום ב${safeCity} בשעות הגן!</h2>
+            <p>הילדים יכלו ליהנות מכל ${formatMinutes(TOTAL_KINDER_MIN)} של הגן 🎉</p>
+          </div>
+        `;
+        results.classList.add('active');
+        return;
+      }
+      const timeInGan = firstAlertMin - kinderStartMin;
+      const timeLost = kinderEndMin - firstAlertMin;
+      const ganPct = Math.round((timeInGan / TOTAL_KINDER_MIN) * 100);
+      const lostPct = 100 - ganPct;
+
+      let html = `
+        <div class="takeout-card">
+          <div class="takeout-title">הילדים היו יכולים להיות היום בגן:</div>
+          <div class="takeout-body">
+            <div class="takeout-stat">
+              <div class="stat-icon">🏫</div>
+              <div class="stat-value">${formatMinutes(timeInGan)}</div>
+              <div class="stat-label">זמן בגן</div>
+            </div>
+            <div class="takeout-arrow">←</div>
+            <div class="takeout-stat">
+              <div class="stat-icon">🔴</div>
+              <div class="stat-value">${formatTime(firstAlertMin)}</div>
+              <div class="stat-label">התרעה ראשונה</div>
+            </div>
+            <div class="takeout-arrow">←</div>
+            <div class="takeout-stat">
+              <div class="stat-icon">🏠</div>
+              <div class="stat-value">${formatMinutes(timeLost)}</div>
+              <div class="stat-label">בבית</div>
+            </div>
+          </div>
+          <div class="pct-bar-container">
+            <div class="pct-bar">
+              <div class="safe-fill" style="width: ${ganPct}%"></div>
+              <div class="lost-fill" style="width: ${lostPct}%"></div>
+            </div>
+            <div class="pct-labels">
+              <span>${ganPct}% בגן</span>
+              <span>${lostPct}% בבית</span>
+            </div>
+          </div>
+          <div class="takeout-note">
+            התרעה ראשונה ב-${formatTime(firstAlertMin)} — הילדים היו יכולים להיות בגן ${formatMinutes(timeInGan)} מתוך ${formatMinutes(TOTAL_KINDER_MIN)}.
+          </div>
+        </div>
+      `;
+
+      results.innerHTML = html;
+      results.classList.add('active');
+    }
+  </script>
+</body>
+</html>
