@@ -1609,17 +1609,17 @@ app.get('/api/alerts', async (req, res) => {
 
   try {
     const allAlerts = [];
-    let page = 1;
+    let offset = 0;
     const limit = 100;
-    let totalPages = 1;
+    let hasMore = true;
 
     // Get today's date boundaries in Israel timezone
     const now = new Date();
     const israelDate = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
     const todayStr = israelDate.toISOString().split('T')[0];
 
-    while (page <= totalPages) {
-      const url = `${API_BASE}/api/stats/history?search=${encodeURIComponent(city)}&limit=${limit}&page=${page}`;
+    while (hasMore) {
+      const url = `${API_BASE}/api/stats/history?search=${encodeURIComponent(city)}&limit=${limit}&offset=${offset}`;
       const response = await fetch(url, {
         headers: { 'Authorization': API_TOKEN }
       });
@@ -1629,7 +1629,7 @@ app.get('/api/alerts', async (req, res) => {
       }
 
       const json = await response.json();
-      totalPages = json.meta.totalPages;
+      hasMore = json.pagination?.hasMore ?? false;
 
       // Filter to today's missile alerts only (skip endAlert, newsFlash, etc.)
       for (const alert of json.data) {
@@ -1648,12 +1648,12 @@ app.get('/api/alerts', async (req, res) => {
           });
         } else if (alertDateStr < todayStr) {
           // Alerts are ordered by date desc, so we can stop paginating
-          totalPages = 0;
+          hasMore = false;
           break;
         }
       }
 
-      page++;
+      offset += limit;
     }
 
     const result = { alerts: allAlerts, date: todayStr };
